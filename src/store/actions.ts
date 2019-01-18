@@ -11,7 +11,7 @@ export const removeSite = (state, val) => {
 }
 
 export const emit = (state, val) => {
-    console.log(state)
+    // console.log(state)
     return { events: { ...state.events, ...val } }
 }
 

@@ -69,7 +69,7 @@ const setUserAgent = (window, userAgent) => {
         const location = request.location ? `&${source.location}${request.location}` : ''
         const expMin = request.expMin ? `&${source.expMin}${request.expMin}` : ''
         const expMax = request.expMax ? `&${source.expMax}${request.expMax}` : ''
-        const page = request.page ? `&${source.page.replace('{num}', request.page)}` : ''
+        const page = request.page ? `&${source.page.replace('{num}', request.page).replace('{dec}', request.page*20)}` : ''
 
         const url = site + search + include + exclude + location + expMin + expMax + page
         return encodeURI(url)
@@ -117,7 +117,6 @@ const setUserAgent = (window, userAgent) => {
                 const company = el.getElementsByClassName(strip[site].company)[0]
                 const location = el.getElementsByClassName(strip[site].location)[0]
 
-                console.log(el.getAttribute('href'))
                 const applicationURL = !!el.getAttribute('href') ? `/viewjob?jk=${el.getAttribute('href').substring(2)}` : null //for indeed
                 const companyURL = (company.getElementsByTagName('a')[0] || company).getAttribute('href')
                 filtered.push({

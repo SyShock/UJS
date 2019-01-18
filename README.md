@@ -1,5 +1,5 @@
 # Universal Jobs Search
-Search for job offers of various sites all in one page
+Search for job offers on various sites, all in one page
 
 Description:
 A light-weight preact app I wanted to do while learning preact
@@ -7,7 +7,7 @@ A light-weight preact app I wanted to do while learning preact
 Features:
 - Fetching data from various sites
 - Continuous scrolling
-- Faving offers, which you've prefered
+- Faving offers, which you've preferred
 - Settings and favs are saved in the browser
 - Selecting which jobs sites interest you, and optionally filtering by clicking on the badges
 
