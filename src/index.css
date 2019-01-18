@@ -1,0 +1,35 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css");
+@import url("https://use.fontawesome.com/releases/v5.6.3/css/all.css");
+
+.card-content {
+    padding: 0.5rem;
+}
+.searchfield{
+    margin-bottom: 1rem;
+}
+.icon {
+    position: absolute;
+    cursor: pointer;
+    left: 0.1rem;
+    width: 2rem;
+    height: 2rem;
+    opacity: 0;
+    transition: opacity 200ms ease-in, color 200ms ease-in;
+}
+.media-content {
+    padding-left: 1.5rem;
+}
+.title:hover ~ .icon, .icon:hover {
+    opacity: 1;
+}
+.icon:hover {
+    color:steelblue;
+}
+.starred {
+    opacity: 1;
+    color:dodgerblue;
+}
+.fav-toggler{
+    position: absolute;
+    top: 1.3rem;
+}

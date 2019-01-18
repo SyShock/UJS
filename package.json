@@ -1,0 +1,50 @@
+{
+  "name": "ujs",
+  "version": "1.0.0",
+  "description": "Universal Jobs Search",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose",
+    "lint": "lynt src/**/*.js --ignore tests/**/*.* --typescript --react",
+    "dev": "parcel ./src/index.html -p 4200",
+    "build": "rm -rf dist && parcel build ./src/index.html --public-url './'"
+  },
+  "keywords": [
+    "jobs",
+    "search",
+    "universal"
+  ],
+  "author": "https://github.com/syshock",
+  "license": "MIT",
+  "dependencies": {
+    "preact": "^8.3.0",
+    "preact-bind-group": "^2.0.3",
+    "redux-zero": "^4.13.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.1",
+    "@types/parcel-env": "0.0.0",
+    "jest": "^23.4.2",
+    "lynt": "^0.3.1",
+    "parcel-bundler": "^1.11.0",
+    "parcel-plugin-typescript": "^1.0.0",
+    "prettier": "^1.14.2",
+    "puppeteer": "^1.6.2",
+    "ts-jest": "^22.4.1",
+    "typescript": "^3.2.4"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}
