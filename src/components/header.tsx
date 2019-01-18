@@ -54,7 +54,7 @@ class Header extends Component<any, any> {
     componentWillReceiveProps(current, prev) { }
 
     handleSubmit = (ev): void => {
-        ev.preventDefault() //submit refeshes the page, you need to prevent that behaviour
+        ev.preventDefault() //submit refreshes the page, you need to prevent that behavior
         this.props.newSearch(this.state.input)
         this.props.setSearching(true);
     }

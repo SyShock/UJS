@@ -17,6 +17,7 @@ const strip = {
     monster: monster.filter
 }
 
+// consider removing this, it's handled by the reverse-proxy
 const setUserAgent = (window, userAgent) => {
     if (window.navigator.userAgent != userAgent) {
         var userAgentProp = { get: function () { return userAgent; } };
@@ -107,7 +108,7 @@ const setUserAgent = (window, userAgent) => {
         const xmlDoc = parser.parseFromString(xml, "text/html");
         const elements = xmlDoc.getElementsByClassName(strip[site].container)
         let filtered: Array<IJob> = []
-        // this seriously needs to optimised
+        // this seriously needs to optimized
         for (const i in elements) {
             const el: Element = elements[i]
             try {

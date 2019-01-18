@@ -31,6 +31,7 @@ Planning to implement:
 - Add search by location, salary range, job type and exclusions
 - Saving favs and settings for added site
 - Adding more sites
+- Improving the searchbar and header
 
 Run development server: `npm run dev`<br/>
 Build the project (on /dist): `npm run build`<br/>

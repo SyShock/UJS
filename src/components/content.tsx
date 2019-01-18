@@ -2,7 +2,6 @@ import { h, Component } from "preact";
 import connectStore from "../store/connect";
 import { setSearching, addFav, removeFav } from "../store/actions"
 import * as REQ from '../models/providersURLs';
-import resu from './content.mock';
 
 const Card = (props) => {
     const { title, postedOn, company, location, site } = props.data
@@ -15,7 +14,7 @@ const Card = (props) => {
                         <div class="wrapper">
                             <p>
                                 <a target="_blank" class="title is-4" href={title.url} title={title.name}>{title.name}</a>
-                                <div onClick={(ev) => props.onClick(ev, props.data)} title="Add to Favourites" class={`icon ${isStarred}`}>
+                                <div onClick={(ev) => props.onClick(ev, props.data)} title="Add to Favorites" class={`icon ${isStarred}`}>
                                     <i class={`fas fa-star`}></i>
                                 </div>
                             </p>
@@ -52,7 +51,7 @@ class Content extends Component<any, any> {
     loadedFavs: boolean = false
     resBackup: {} = {}
     state = {
-        res: resu as any
+        res: {} as any
     }
 
     constructor() {
