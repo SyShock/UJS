@@ -55,6 +55,7 @@ const setUserAgent = (window, userAgent) => {
         company: { name: string, url: string }
         postedOn: string
         site: string
+        salary: string
     }
 
     const stitchUrl = (request: IURLRequest) => {
@@ -116,21 +117,24 @@ const setUserAgent = (window, userAgent) => {
                 const postedOn = el.getElementsByClassName(strip[site].postedOn)[0]
                 const company = el.getElementsByClassName(strip[site].company)[0]
                 const location = el.getElementsByClassName(strip[site].location)[0]
+                const salary = el.getElementsByClassName(strip[site].salary)[0]
 
                 const applicationURL = !!el.getAttribute('href') ? `/viewjob?jk=${el.getAttribute('href').substring(2)}` : null //for indeed
                 const companyURL = (company.getElementsByTagName('a')[0] || company).getAttribute('href')
                 filtered.push({
                     title: {
-                        name: (title.firstElementChild || title).getAttribute('title') || title.textContent,
+                        name: (title.firstElementChild || title).getAttribute('title') || title.textContent.trim(),
                         url: (noSiteAppend ? '' : base) + (!!applicationURL ? applicationURL : (title.getElementsByTagName('a')[0] || title).getAttribute('href'))
                     },
                     postedOn: postedOn.textContent,
                     company: {
-                        name: (company.firstElementChild || company).getAttribute('title') || company.textContent,
+                        name: (company.firstElementChild || company).getAttribute('title') || company.textContent.trim(),
                         url: companyURL ? (noSiteAppend ? '' : base) + companyURL : null
                     },
                     location: location ? location.textContent : '',
-                    site: site + suffix
+                    site: site + suffix,
+                    salary: salary ? salary.textContent : null
+
                 })
             } catch (e) { console.error(e) }
         }

@@ -6,3 +6,4 @@ yarn-error.log
 package-lock.json
 notes.txt
 *.mock.*
+push-to-gh.sh

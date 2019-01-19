@@ -4,7 +4,7 @@ import { setSearching, addFav, removeFav } from "../store/actions"
 import * as REQ from '../models/providersURLs';
 
 const Card = (props) => {
-    const { title, postedOn, company, location, site } = props.data
+    const { title, postedOn, company, location, site, salary } = props.data
     const isStarred = !!props.favs[title.url] ? 'starred' : ""
     return (
         <div class="card">
@@ -26,8 +26,8 @@ const Card = (props) => {
                             {location}
                             </p>
                         </div>
+                        <p>{salary}</p>
                         <p>{postedOn} {site}</p>
-
                     </div>
                 </div>
             </div>
