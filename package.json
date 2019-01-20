@@ -1,7 +1,7 @@
 {
   "name": "ujs",
   "version": "1.0.0",
-  "description": "Universal Jobs Search",
+  "description": "Universal Job Search",
   "main": "index.js",
   "scripts": {
     "test": "jest --verbose",

@@ -14,7 +14,7 @@ const Card = (props) => {
                         <div class="wrapper">
                             <p>
                                 <a target="_blank" class="title is-4" href={title.url} title={title.name}>{title.name}</a>
-                                <div onClick={(ev) => props.onClick(ev, props.data)} title="Add to Favorites" class={`icon ${isStarred}`}>
+                                <div onClick={(ev) => props.onClick(ev, props.data)} title="Add to Favorites" class={`star-icon icon ${isStarred}`}>
                                     <i class={`fas fa-star`}></i>
                                 </div>
                             </p>
@@ -36,11 +36,12 @@ const Card = (props) => {
 }
 
 export interface IRequest {
-    site: string,
-    search?: string,
-    suffix?: string,
-    prefix?: string,
-    noSiteAppend?: boolean,
+    site: string
+    keyword?: string
+    location?: string
+    suffix?: string
+    prefix?: string
+    noSiteAppend?: boolean
     page?: number
 }
 
@@ -72,15 +73,16 @@ class Content extends Component<any, any> {
         this.page = 1
 
         newProps.sites.forEach(site => {
-            this.getRequest({ ...site, search })
+            this.getRequest({ ...site, ...search })
         })
     }
 
     getRequest(req: IRequest): void {
-        const { site, search, prefix, suffix, noSiteAppend, page } = req;
+        const { site, keyword, location ,prefix, suffix, noSiteAppend, page } = req;
         const url = REQ.stitchUrl({
             site,
-            search,
+            keyword,
+            location,
             suffix,
             prefix,
             page
@@ -105,7 +107,7 @@ class Content extends Component<any, any> {
             && !isSearching) {
             this.props.setSearching(true);
             sites.forEach(site => {
-                this.getRequest({ ...site, search: searching, page: this.page })
+                this.getRequest({ ...site, ...searching, page: this.page })
             })
             this.page++
         }

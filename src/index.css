@@ -5,10 +5,13 @@
 .card-content {
     padding: 0.5rem;
 }
-.searchfield{
+.search-field{
     margin-bottom: 1rem;
 }
-.icon {
+.search-form{
+    display: flex;
+}
+.star-icon {
     top: 0.3rem;
     position: absolute;
     cursor: pointer;
@@ -18,10 +21,13 @@
     opacity: 0;
     transition: opacity 200ms ease-in, color 200ms ease-in;
 }
+.tag {
+    user-select: none; 
+}
 .media-content {
     padding-left: 1.5rem;
 }
-.title:hover ~ .icon, .icon:hover {
+.title:hover ~ .star-icon, .star-icon:hover {
     opacity: 1;
 }
 .icon:hover {

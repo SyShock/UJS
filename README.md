@@ -1,4 +1,4 @@
-# Universal Jobs Search
+# Universal Job Search
 Search for job offers on various sites, all in one page<br> 
 [Demo](https://syshock.github.io/UJS/)
 ### Description:

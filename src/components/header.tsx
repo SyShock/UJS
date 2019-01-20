@@ -37,15 +37,21 @@ const Badges = (props) => {
     )
 }
 
+const keywordTooltip = `Python, Javascript, etc`
+const locationTooltip = `Berlin, Budapest, NY, etc`
+
 @connectStore({ newSearch, setSearching, emit, addSite, removeSite, filterBySite })
 class Header extends Component<any, any> {
 
     toggledFavs: boolean = false
     state = {
-        input: '',
+        keyword: '',
+        location: '',
         loading: false,
         drop: false
     }
+    form: any
+
 
     constructor() {
         super();
@@ -54,14 +60,19 @@ class Header extends Component<any, any> {
     componentWillReceiveProps(current, prev) { }
 
     handleSubmit = (ev): void => {
+        const { location, keyword } = this.state;
         ev.preventDefault() //submit refreshes the page, you need to prevent that behavior
-        this.props.newSearch(this.state.input)
+        this.props.newSearch({
+            keyword,
+            location
+        })
         this.props.setSearching(true);
     }
 
     handleInput = (ev): void => {
+        const name = ev.target.name
         this.setState({
-            input: ev.target.value
+            [name]: ev.target.value
         })
     }
 
@@ -93,15 +104,22 @@ class Header extends Component<any, any> {
         }
         return (
             <div>
-                <h2 class="title has-text-grey has-text-centered">Universal Jobs Search</h2>
-                <a class="button is-light -fav-toggler" onClick={this.toggleFavs}>Show Favs Only</a>
+                <h2 class="title has-text-grey has-text-centered">Universal Job Search</h2>
+                <a class="button is-light -fav-toggler" onClick={this.toggleFavs}>Show Favorites Only</a>
                 <Dropdown.Trigger>
                     <Dropdown.Menu content={_data} onSelect={addSite}></Dropdown.Menu>
                 </Dropdown.Trigger>
                 <div class="field">
                     <div class={`control is-medium`}>
-                        <form onSubmit={this.handleSubmit}>
-                            <input type="text" class="input is-medium searchfield" onInput={this.handleInput} placeholder="Query..." />
+                        <form class={`search-form`} onSubmit={this.handleSubmit}>
+                            <input type="text" style={`width: 150rem;`} class="input search-field" name='keyword' onInput={this.handleInput} placeholder="Search..." title={keywordTooltip} />
+                            <input type="text" style={`width: 50rem;`} class="input search-field" name='location' onInput={this.handleInput} placeholder="Location..." title={locationTooltip} />
+                            <a class="button">
+                                <span class="icon is-small" onClick={this.handleSubmit} title="Submit Query">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </a>
+                            <button style={`display: none;`}></button>
                         </form>
                     </div>
                 </div>

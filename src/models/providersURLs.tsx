@@ -32,7 +32,7 @@ const setUserAgent = (window, userAgent) => {
 }
     interface IURLRequest {
         site: string
-        search?: string
+        keyword?: string
         include?: string
         exclude?: string
         location?: string
@@ -64,7 +64,7 @@ const setUserAgent = (window, userAgent) => {
         const source = sites[request.site]
         let site = (source.site as string).replace('{prefix}', prefix)
         site = site.replace('{suffix}', suffix) + '?'
-        const search = request.search ? `${source.search}${request.search}` : ''
+        const search = request.keyword ? `${source.search}${request.keyword}` : ''
         const include = request.include ? `&${source.include}${request.include}` : ''
         const exclude = request.exclude ? `&${source.exclude}${request.exclude}` : ''
         const location = request.location ? `&${source.location}${request.location}` : ''
