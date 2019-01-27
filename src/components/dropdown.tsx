@@ -35,7 +35,16 @@ class Trigger extends Component<any, any> {
     }
 }
 
-class DropMenu extends Component<any, any> {
+type MenuProps = {
+    content: Array<any>,
+    node?: any,
+    hide?: () => void,
+    onSelect: (...any) => void
+    setRefs?: (element: any, index: number) => void
+    style: string
+}
+
+class DropMenu extends Component<MenuProps, any> {
     componentWillMount() {
         document.addEventListener('mousedown', this.handleClick, false)
     }
@@ -52,20 +61,20 @@ class DropMenu extends Component<any, any> {
         hide()
     }
 
-    handleMenuClick = (ev: Event, val): void => {
+    handleMenuClick = (ev: Event, val, index): void => {
         const { onSelect, hide } = this.props
-        onSelect(val)
+        onSelect(val, index)
         hide()
     }
 
     render() {
-        const { content } = this.props;
+        const { content, setRefs, style } = this.props;
         return (
-            <div class="dropdown-menu" id="dropdown-menu" role="menu" >
+            <div class="dropdown-menu" id="dropdown-menu" role="menu" style={style} >
                 <div class="dropdown-content">
-                    {content && content.map((val) => (
-                        <a class="dropdown-item" onClick={(ev) => this.handleMenuClick(ev, val)}>
-                            {val.prefix}{val.site}{val.suffix}
+                    {content && content.map((val, index) => (
+                        <a class="dropdown-item" ref={node => {setRefs && setRefs(node,index)}} onClick={(ev) => this.handleMenuClick(ev, val, index)}>
+                            {val}
                         </a>
                     ))}
                 </div>
@@ -74,17 +83,10 @@ class DropMenu extends Component<any, any> {
     }
 }
 
-class Dropdown extends Component<any, any> {
+class Dropdown {
     static Trigger: typeof Trigger = Trigger;
     static Menu: typeof DropMenu = DropMenu;
 
-    render() {
-        return (
-            <Trigger>
-                <DropMenu></DropMenu>
-            </Trigger>
-        )
-    }
 }
 
 export {

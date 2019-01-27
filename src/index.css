@@ -41,3 +41,11 @@
     position: absolute;
     top: 1.3rem;
 }
+.dropdown-content {
+    max-height: 20rem;
+    overflow-y: scroll;
+}
+
+.input[type=search] {
+    border-radius: 3px;
+}

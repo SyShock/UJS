@@ -1,37 +1,42 @@
 import { IURLRequest } from "../models/providersURLs";
+import { defaultStore as Store, IStoreEvents } from './store'
 
-export const newSearch = (state, val) => ({ searching: val })
-export const setSearching = (state, val) => ({ isSearching: val })
+export const newSearch = (state: Store, val): Store => ({ searching: val })
+export const setSearching = (state: Store, val): Store => ({ isSearching: val })
 
-export const addSite = (state, val) => ({ sites: [...state.sites, val] })
-export const removeSite = (state, val) => {
-    let {sites} = state
-    sites = sites.filter(item => item !== val)
-    return {sites}
+export const addSite = (state: Store, val): Store => ({ sites: [...state.sites, val] })
+export const removeSite = (state: Store, val): Store => {
+    let { sites } = state
+    sites = sites.filter(item => item.site !== val.site)
+    return { sites }
 }
 
-export const emit = (state, val) => {
-    // console.log(state)
+export const clearSites = (state: Store) => ({sites: []})
+
+export const setSearchType = (state: Store, val): Store => ({ searchType: val })
+
+export const emit = (state: Store, val): Store => {
     return { events: { ...state.events, ...val } }
 }
 
-export const addFav = (state, fav) => {
-    return { favs: {...state.favs, [fav.title.url]: fav} }
+export const addFav = (state: Store, fav): Store => {
+    return { favs: { ...state.favs, [fav.title.url]: fav } }
 }
-export const removeFav = (state, fav) => {
+export const removeFav = (state: Store, fav): Store => {
     const favs = state.favs
     delete favs[fav.title.url]
-    return { favs: {...favs} }
+    return { favs: { ...favs } }
 }
 
-export const filterBySite = (state, site: IURLRequest) => { //as a toggle
+export const filterBySite = (state: Store, site: IURLRequest): Store => { //as a toggle
     const filterBy = state.filterBy;
-    const _site = [site.prefix, site.site, site.suffix].join('')
-    const index = filterBy.indexOf(_site)
-    if (index !== -1){
+    const index = filterBy.indexOf(site)
+    if (index !== -1) {
         filterBy.splice(index, 1)
     } else {
-        filterBy.push(_site)
+        filterBy.push(site)
     }
     return { filterBy: [...filterBy] }
 }
+
+export type Action = (val: any) => any

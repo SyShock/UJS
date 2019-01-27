@@ -1,6 +1,7 @@
 import * as stackoverflow from '../utils/stackoverflow'
 import * as indeed from '../utils/indeed'
 import * as monster from '../utils/monster'
+import ISO from '../utils/countryCode'
 
 // const reverseProxy = `https://cors-anywhere.herokuapp.com/`
 const reverseProxy = `https://evening-depths-43509.herokuapp.com/`
@@ -31,7 +32,8 @@ const setUserAgent = (window, userAgent) => {
     }
 }
     interface IURLRequest {
-        site: string
+        site: string,
+        country?: string
         keyword?: string
         include?: string
         exclude?: string
@@ -59,20 +61,29 @@ const setUserAgent = (window, userAgent) => {
     }
 
     const stitchUrl = (request: IURLRequest) => {
-        const suffix = request.suffix ? `${request.suffix}` : '.com'
-        const prefix = request.prefix ? `${request.prefix}` : 'www.'
-        const source = sites[request.site]
-        let site = (source.site as string).replace('{prefix}', prefix)
-        site = site.replace('{suffix}', suffix) + '?'
+        // const suffix = request.suffix ? `${request.suffix}` : '.com'
+        // const prefix = request.prefix ? `${request.prefix}` : 'www.'
+        let source = sites[request.site] 
+        // let site = (source.site as string).replace('{prefix}', prefix)
+        // site = site.replace('{suffix}', suffix) + '?'
+
+        let location
+        if (request.country && Object.values(source)[0] instanceof Object) {
+            source = source[request.country]
+            location = request.location ? `&${source.location}${request.location}` : ''
+        } else {
+            location = request.country ? `&${source.location}${ISO.shortHandles[request.country]}+${request.location}` : ''
+        }
+
+        let site = source.site + '?'
         const search = request.keyword ? `${source.search}${request.keyword}` : ''
         const include = request.include ? `&${source.include}${request.include}` : ''
         const exclude = request.exclude ? `&${source.exclude}${request.exclude}` : ''
-        const location = request.location ? `&${source.location}${request.location}` : ''
         const expMin = request.expMin ? `&${source.expMin}${request.expMin}` : ''
         const expMax = request.expMax ? `&${source.expMax}${request.expMax}` : ''
-        const page = request.page ? `&${source.page.replace('{num}', request.page).replace('{dec}', request.page*20)}` : ''
-
-        const url = site + search + include + exclude + location + expMin + expMax + page
+        const page = request.page ? `&${source.page.replace('{num}', request.page).replace('{dec}', (request.page-1)*20)}` : ''
+        
+        const url = site + search + location + include + exclude  + expMin + expMax + page
         return encodeURI(url)
     }
 
@@ -85,8 +96,7 @@ const setUserAgent = (window, userAgent) => {
     class StripConfig {
         xml: string
         site: string
-        suffix: string = '.com'
-        prefix: string = 'www.'
+        country?: string
         noSiteAppend: boolean
     }
 
@@ -99,9 +109,8 @@ const setUserAgent = (window, userAgent) => {
 
     const stripDOM = (config: StripConfig) => {
         config = merge(new StripConfig(), config)
-        let { site, prefix, suffix, xml, noSiteAppend } = config
-        let base = (sites[site].base as string).replace('{prefix}', prefix)
-        base = (base as string).replace('{suffix}', suffix)
+        let { site, xml, noSiteAppend, country } = config
+        const base = sites[site].base || sites[site][country].base
 
         const parser = new DOMParser();
         const regex = /<body[^>]*>((.|[\n\r])*)<\/body>/g
@@ -132,7 +141,7 @@ const setUserAgent = (window, userAgent) => {
                         url: companyURL ? (noSiteAppend ? '' : base) + companyURL : null
                     },
                     location: location ? location.textContent : '',
-                    site: site + suffix,
+                    site: site,
                     salary: salary ? salary.textContent : null
 
                 })
