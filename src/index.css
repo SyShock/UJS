@@ -49,3 +49,6 @@
 .input[type=search] {
     border-radius: 3px;
 }
+.danger {
+    border-color: red;
+}

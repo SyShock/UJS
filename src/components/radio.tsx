@@ -70,8 +70,8 @@ export class Radio extends Component<Props, any> {
                     <input type="radio" name="all" checked={this.isSelected('all')} onChange={this.handleChange} />
                     All
                 </label>
-                <label class="radio">
-                    <input type="radio" name="remote" checked={this.isSelected('remote')} onChange={this.handleChange} />
+                <label class="radio" disabled>
+                    <input type="radio" name="remote" checked={this.isSelected('remote')} onChange={this.handleChange} disabled/>
                     Remote
                 </label>
                 <label class="radio" >

@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
 import connectStore from "../store/connect";
-import { setSearching, addFav, removeFav, Action } from "../store/actions"
+import { setSearching, addFav, removeFav, Action, lockSite, clearLocks } from "../store/actions"
 import * as REQ from '../models/providersURLs';
 import { defaultStore } from "../store/store";
 import ISO from '../utils/countryCode'
@@ -44,13 +44,16 @@ export interface IRequest {
     location?: string
     country?: string
     noSiteAppend?: boolean
-    page?: number
+    page?: number,
+    locked?: boolean
 }
 
 class Actions {
     setSearching = setSearching as Action
     removeFav = removeFav as Action
     addFav = addFav as Action
+    lockSite = lockSite as Action
+    clearLocks = clearLocks as () => any
 }
 
 interface Props extends defaultStore, Actions {
@@ -59,12 +62,12 @@ interface Props extends defaultStore, Actions {
 @connectStore(new Actions())
 class Content extends Component<Props, any> {
     page: number
-    loadedFavs: boolean = false
-    resBackup: {} = {}
+    resBackup: Array<any> = []
     state = {
-        res: {} as any
+        res: [] as Array<any>
     }
     node: Element = null;
+    res: Object = {}
 
     constructor() {
         super()
@@ -78,33 +81,35 @@ class Content extends Component<Props, any> {
     }
 
     //this needs to be managed better
-    componentWillReceiveProps(newProps) {
+    componentWillReceiveProps(newProps: Props) {
         if (this.props.events.toggleFavs !== newProps.events.toggleFavs) {
-            this.handleShowOnlyFavs(newProps.events.toggleFavs); return
+            this.handleShowOnlyFavs(newProps.events.toggleFavs);
         }
-        if (this.props.searching !== newProps.searching) {
-            this.handleSubmit(newProps); return
+        if (this.props.searching !== newProps.searching && newProps.isSearching) {
+            this.handleSubmit(newProps);
         }
 
     }
 
     handleSubmit(newProps: Props) {
-        const { searching } = newProps
+        const { searching, clearLocks } = newProps
 
         // reset without rendering
-        this.state.res = {} as any
+        this.state.res = [] as any
         this.page = 1
-
+        clearLocks()
+        this.res = {}
         newProps.sites.forEach(site => {
             this.getRequest({ ...searching, ...site, page: this.page })
         })
         this.page++
     }
 
-    getRequest(req: IRequest): void {
+    getRequest(req: IRequest): boolean {
         const lastElement = this.node
-        const { searchType } = this.props
-        const { site, country, noSiteAppend } = req;
+        const { searchType, lockSite } = this.props
+        const { site, country, noSiteAppend, locked } = req;
+        if (locked) return false; 
         const url = REQ.stitchUrl({
             ...req
         })
@@ -115,14 +120,24 @@ class Content extends Component<Props, any> {
                 this.props.setSearching(false);
                 const _country = searchType !== 'location' ? country : null
                 const _site = [ISO.shortHandles[_country], site].filter(Boolean).join(' - ')
-                this.state.res[_site] = [...(this.state.res[_site] || []), ...REQ.stripDOM({ xml: res, site, country, noSiteAppend })]
+                const array = REQ.stripDOM({ xml: res, site, country, noSiteAppend })
+                if (array.length === 0 || (this.res[_site] || []).find(item => item.title.url === array[0].title.url)) {
+                    if (searchType !== 'location'){
+                        lockSite({ site, _country })
+                    } else {
+                        lockSite({ site })
+                    }
+                    return false
+                }
+                this.res[_site] = [...(this.res[_site] || []), ...array]
                 this.setState({
-                    res: { ...this.state.res }
+                    res: [...this.state.res, ...array]
                 })
                 if (lastElement) {
                     lastElement.scrollIntoView({ block: 'nearest' })
                 }
             })
+        return true; // used to signal if there should be a loading animation
     }
 
     handleScroll = (ev: Event) => {
@@ -130,9 +145,10 @@ class Content extends Component<Props, any> {
         if (((window.innerHeight + window.scrollY) >= document.body.offsetHeight)
             && !this.props.events.toggleFavs
             && !isSearching) {
-            this.props.setSearching(true);
             sites.forEach(site => {
-                this.getRequest({ ...searching, ...site, page: this.page })
+                if (this.getRequest({ ...searching, ...site, page: this.page })) {
+                    this.props.setSearching(true);
+                }
             })
             this.page++
         }
@@ -156,33 +172,56 @@ class Content extends Component<Props, any> {
             this.resBackup = this.state.res
             this.state.res = {} as any;
             this.setState({
-                res: {
-                    favs: Object.values(favs)
-                }
+                res: Object.values(favs)
             })
         }
     }
 
-    render() {
-        let { res } = this.state;
-        let { isSearching, favs, filterBy } = this.props;
-        const hasFilter = filterBy.length > 0
+    renderSpecificSelection() {
+        let { favs, filterBy } = this.props;
         return (
-            <div class="has-text-grey has-text-centered" style={`padding-bottom: 25rem;`}>
-                {Object.keys(res).map(
-                    key => {
-                        const entry = res[key]
-                        if (res.favs || !hasFilter || filterBy.indexOf(key) !== -1)
-                            return entry.map((el: REQ.IJob) => {
-                                return (
-                                    <div>
-                                        <Card ref={node => this.node = node} onClick={this.handleFavClick} data={el} favs={favs} />
-                                    </div>
-                                )
-                            })
-                    }
-                )}
-                <div class={`control is-large ${isSearching ? 'is-loading' : ''}`} style={`width: 50%; top: 1rem`}>
+            Object.keys(this.res).map(
+                key => {
+                    const entry = this.res[key]
+                    if (filterBy.indexOf(key) !== -1)
+                        return entry.map((el: REQ.IJob) => {
+                            return (
+                                <div>
+                                    <Card ref={node => this.node = node} onClick={this.handleFavClick} data={el} favs={favs} />
+                                </div>
+                            )
+                        })
+                }
+            )
+        )
+    }
+
+    getStyles() {
+        const { isSearching } = this.props;
+        return {
+            hasLoader: isSearching ? 'is-loading' : '',
+            wrapper: `padding-bottom: 25rem;`,
+            loader: `width: 50%; top: 1rem`
+        }
+    }
+
+    render() {
+        const { res } = this.state;
+        const { favs, filterBy } = this.props;
+        const hasFilter = filterBy.length > 0
+        const styles = this.getStyles()
+        return (
+            <div class="has-text-grey has-text-centered" style={styles.wrapper}>
+                {!hasFilter && res.map((el: REQ.IJob) => {
+                    return (
+                        <div>
+                            <Card ref={node => this.node = node} onClick={this.handleFavClick} data={el} favs={favs} />
+                        </div>
+                    )
+                })
+                }
+                {hasFilter && this.renderSpecificSelection()}
+                <div class={`control is-large ${styles.hasLoader}`} style={styles.loader}>
                 </div>
             </div>
         )

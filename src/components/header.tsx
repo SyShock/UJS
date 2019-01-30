@@ -15,7 +15,7 @@ import ISO from '../utils/countryCode'
 const _data: Array<IRequest> = [
     { site: 'stackoverflow' },
     { site: 'indeed' },
-    { site: 'monster', noSiteAppend: true }
+    // { site: 'monster', noSiteAppend: true }
 ]
 
 
@@ -73,7 +73,8 @@ class Header extends Component<Props, any> {
         country: '',
         loading: false,
         drop: false,
-        countryRequirement: false
+        countryRequirement: false,
+        siteRequirement: false
     }
     form: any
 
@@ -103,15 +104,17 @@ class Header extends Component<Props, any> {
 
     handleSubmit = (ev): void => {
         const { location, keyword, country } = this.state;
-        const { searchType } = this.props
-        ev.preventDefault() //submit refreshes the page, you need to prevent that behavior
+        const { searchType, emit } = this.props
+        ev.preventDefault() //submit refreshes the page, this prevents that behavior
+        if (this.props.sites.length === 0) {
+            this.setState({ siteRequirement: true })
+            return;
+        }
         if (searchType === 'location' && !country) {
             this.setState({ countryRequirement: true })
             return;
         }
-        if (this._sites.length < 0){
-            return;
-        }
+        emit({ toggleFavs: false })
         this.props.newSearch({
             keyword,
             location,
@@ -121,11 +124,16 @@ class Header extends Component<Props, any> {
     }
 
     handleSearchTypeChange(props: Props) {
+        this.data = _data.concat()
         switch (props.searchType) {
-            case 'all': this.data = onAllSelected('indeed', indeed.stitcher); break;
-            case 'remote': this.data = _data; break;
-            case 'location': this.data = _data; break;
-            default: this.data = _data; break;
+            case 'all': {
+                this.data.splice(1,1)
+                this.data = [... this.data, ...onAllSelected('indeed', indeed.stitcher)]; 
+                break;
+            }
+            case 'remote': break;
+            case 'location': break;
+            default: break;
         }
     }
 
@@ -163,6 +171,7 @@ class Header extends Component<Props, any> {
     }
     addSite = (val, index) => {
         const { addSite } = this.props;
+        this.setState({ siteRequirement: false })
         addSite(this._data[index])
     }
     removeSite = (index) => {
@@ -190,7 +199,7 @@ class Header extends Component<Props, any> {
     }
 
     render() {
-        const { countryRequirement } = this.state
+        const { countryRequirement, siteRequirement } = this.state
         const { filterBySite, filterBy, searchType, searching } = this.props;
         const _data = this._data.map(item => [ISO.shortHandles[item.country], item.site].filter(Boolean).join(' - '))
         const isLocation = searchType === 'location'
@@ -200,7 +209,7 @@ class Header extends Component<Props, any> {
                 <h2 class="title has-text-grey has-text-centered">Universal Job Search</h2>
                 <Radio />
                 <a class="button is-light -fav-toggler" onClick={this.toggleFavs}>Show Favorites Only</a>
-                <Dropdown.Trigger>
+                <Dropdown.Trigger attention={siteRequirement}>
                     <Dropdown.Menu content={_data} onSelect={this.addSite}></Dropdown.Menu>
                 </Dropdown.Trigger>
                 <div class="field">

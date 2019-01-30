@@ -1,6 +1,10 @@
 import { h, Component } from "preact";
 
-class Trigger extends Component<any, any> {
+interface Props {
+    attention: boolean
+}
+
+class Trigger extends Component<Props, any> {
     state: {
         dropped: false
     }
@@ -15,14 +19,22 @@ class Trigger extends Component<any, any> {
         this.setState({ dropped: false })
     }
 
+    getStyles() {
+        const { attention } = this.props;
+        return {
+            isDanger: attention ? 'danger' : ''
+        }
+    }
+
     render() {
         const { dropped } = this.state
         const { children } = this.props;
+        const styles = this.getStyles();
         const Menu = children.filter(el => el.nodeName === DropMenu)[0] //using .nodeName will likely cause some incompatibility
         return (
             <div class={`dropdown is-active`} ref={node => this.node = node}>
-                <div class="dropdown-trigger" onClick={this.toggleDrop}>
-                    <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                <div class={`dropdown-trigger`} onClick={this.toggleDrop}>
+                    <button class={`button ${styles.isDanger}`} aria-haspopup="true" aria-controls="dropdown-menu">
                         <span>Select Sites</span>
                         <span class="icon is-small">
                             <i class="fas fa-angle-down" aria-hidden="true"></i>
@@ -35,7 +47,7 @@ class Trigger extends Component<any, any> {
     }
 }
 
-type MenuProps = {
+interface MenuProps {
     content: Array<any>,
     node?: any,
     hide?: () => void,
@@ -73,7 +85,7 @@ class DropMenu extends Component<MenuProps, any> {
             <div class="dropdown-menu" id="dropdown-menu" role="menu" style={style} >
                 <div class="dropdown-content">
                     {content && content.map((val, index) => (
-                        <a class="dropdown-item" ref={node => {setRefs && setRefs(node,index)}} onClick={(ev) => this.handleMenuClick(ev, val, index)}>
+                        <a class="dropdown-item" ref={node => { setRefs && setRefs(node, index) }} onClick={(ev) => this.handleMenuClick(ev, val, index)}>
                             {val}
                         </a>
                     ))}

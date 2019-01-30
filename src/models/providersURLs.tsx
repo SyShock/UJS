@@ -61,11 +61,7 @@ const setUserAgent = (window, userAgent) => {
     }
 
     const stitchUrl = (request: IURLRequest) => {
-        // const suffix = request.suffix ? `${request.suffix}` : '.com'
-        // const prefix = request.prefix ? `${request.prefix}` : 'www.'
         let source = sites[request.site] 
-        // let site = (source.site as string).replace('{prefix}', prefix)
-        // site = site.replace('{suffix}', suffix) + '?'
 
         let location
         if (request.country && Object.values(source)[0] instanceof Object) {
@@ -74,7 +70,7 @@ const setUserAgent = (window, userAgent) => {
         } else {
             location = request.country ? `&${source.location}${ISO.shortHandles[request.country]}+${request.location}` : ''
         }
-
+        if (!source) return
         let site = source.site + '?'
         const search = request.keyword ? `${source.search}${request.keyword}` : ''
         const include = request.include ? `&${source.include}${request.include}` : ''

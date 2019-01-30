@@ -15,7 +15,7 @@ export class AutoCompleteInput extends Component<Props, any> {
         selected: '',
 
     }
-    node: any
+    node: Element
     menuRefs: Array<any> = []
     focusedRef: any = null
 
@@ -36,7 +36,7 @@ export class AutoCompleteInput extends Component<Props, any> {
     }
 
     handleKeyDown = (ev: KeyboardEvent) => {
-        switch (ev.key) { 
+        switch (ev.key) {
             case 'ArrowDown': {
                 let index = 0
                 if (this.focusedRef) {
@@ -63,14 +63,9 @@ export class AutoCompleteInput extends Component<Props, any> {
             case 'Enter': {
                 this.focusedRef.style.background = 'unset'
                 this.focusedRef.click()
-                // this.focusedRef = null
                 return
             }
         }
-    }
-
-    private filter(countries, value) {
-        return Object.keys(countries).filter(item => item.toLowerCase().includes(value.toLowerCase()))
     }
 
     handleFocus = (ev) => {
@@ -92,16 +87,27 @@ export class AutoCompleteInput extends Component<Props, any> {
         this.menuRefs[index] = element;
     }
 
+    private filter(countries, value) {
+        return Object.keys(countries).filter(item => item.toLowerCase().includes(value.toLowerCase()))
+    }
+
+    getStyles() {
+        const { attention } = this.props;
+        return {
+            isDanger: attention ? 'danger' : '',
+            menuStyle: `top: 2rem;`
+        }
+    }
+
     render() {
-        const {attention} = this.props
         const { dropped, content, selected } = this.state
         const hasContent = content.length > 0
-        const isDanger = attention ? 'is-danger' : ''
+        const styles = this.getStyles()
         return (
             <div class="control dropdown is-active" ref={node => this.node = node}>
-                <input class={`input ${isDanger}`} type="search" placeholder={this.props.placeholder} value={selected}
+                <input class={`input ${styles.isDanger}`} type="search" placeholder={this.props.placeholder} value={selected}
                     onKeyDown={this.handleKeyDown} onInput={this.handleInput} onFocus={this.handleFocus} />
-                {dropped && hasContent && <Dropdown.Menu style={`top: 2rem;`} setRefs={this.setMenuRefs} onSelect={this.handleSelect}
+                {dropped && hasContent && <Dropdown.Menu style={styles.menuStyle} setRefs={this.setMenuRefs} onSelect={this.handleSelect}
                     content={content} hide={this.hide} node={this.node} />
                 }
             </div>
