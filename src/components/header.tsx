@@ -3,7 +3,7 @@ import connectStore from "../store/connect";
 import { newSearch, setSearching, emit, addSite, removeSite, filterBySite, Action, clearSites } from "../store/actions"
 import { Dropdown } from './dropdown'
 import { IRequest } from './content'
-import { Radio } from "./radio";
+import { Radio, radioValues } from "./radio";
 import { defaultStore } from "../store/store";
 import { AutoCompleteInput } from "./dropdown-input";
 
@@ -15,13 +15,15 @@ import ISO from '../utils/countryCode'
 const _data: Array<IRequest> = [
     { site: 'stackoverflow' },
     { site: 'indeed' },
-    // { site: 'monster', noSiteAppend: true }
+    { site: 'monster' }
 ]
 
 
 const onAllSelected = (name, sites: any): Array<IRequest> => {
-    return Object.keys(sites).map(key => ({ site: name, country: key }))
-
+    return Object.keys(sites).map(key => {
+        const country = null
+        return { site: name, country: country || key }
+    })
 }
 
 const Badges = (props) => {
@@ -110,7 +112,7 @@ class Header extends Component<Props, any> {
             this.setState({ siteRequirement: true })
             return;
         }
-        if (searchType === 'location' && !country) {
+        if (searchType === radioValues.location && !country) {
             this.setState({ countryRequirement: true })
             return;
         }
@@ -126,13 +128,13 @@ class Header extends Component<Props, any> {
     handleSearchTypeChange(props: Props) {
         this.data = _data.concat()
         switch (props.searchType) {
-            case 'all': {
-                this.data.splice(1,1)
-                this.data = [... this.data, ...onAllSelected('indeed', indeed.stitcher)]; 
+            case radioValues.all: {
+                this.data.splice(1, 2)
+                this.data = [... this.data, ...onAllSelected('indeed', indeed.stitcher), ...onAllSelected('monster', monster.stitcher)];
                 break;
             }
-            case 'remote': break;
-            case 'location': break;
+            case radioValues.remote: break;
+            case radioValues.location: break;
             default: break;
         }
     }
@@ -186,23 +188,23 @@ class Header extends Component<Props, any> {
         })
     }
 
-    handleBadgeClick = (val:string) => {
-        const {searchType, filterBySite} = this.props
-        if (searchType !== 'location') {
+    handleBadgeClick = (val: string) => {
+        const { searchType, filterBySite } = this.props
+        if (searchType !== radioValues.location) {
             const splitString = val.split(' - ')
             val = `${splitString[1]}.${ISO.handles[splitString[0]]}`
             filterBySite(val)
         } else {
             filterBySite(val)
         }
-        
+
     }
 
     render() {
         const { countryRequirement, siteRequirement } = this.state
         const { filterBySite, filterBy, searchType, searching } = this.props;
         const _data = this._data.map(item => [ISO.shortHandles[item.country], item.site].filter(Boolean).join(' - '))
-        const isLocation = searchType === 'location'
+        const isLocation = searchType === radioValues.location
 
         return (
             <div>

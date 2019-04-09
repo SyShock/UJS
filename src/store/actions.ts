@@ -1,11 +1,12 @@
 import { IURLRequest } from "../models/providersURLs";
 import { defaultStore as Store, IStoreEvents } from './store'
+import { IRequest } from "../components/content";
 
 export const newSearch = (state: Store, val): Store => ({ searching: val })
 export const setSearching = (state: Store, val): Store => ({ isSearching: val })
 
-export const addSite = (state: Store, val): Store => ({ sites: [...state.sites, val] })
-export const removeSite = (state: Store, val): Store => {
+export const addSite = (state: Store, val: IRequest): Store => ({ sites: [...state.sites, val] })
+export const removeSite = (state: Store, val: IRequest): Store => {
     let { sites } = state
     sites = sites.filter(item => JSON.stringify(item) !== JSON.stringify(val))
     return { sites }

@@ -4,6 +4,7 @@ import { setSearching, addFav, removeFav, Action, lockSite, clearLocks } from ".
 import * as REQ from '../models/providersURLs';
 import { defaultStore } from "../store/store";
 import ISO from '../utils/countryCode'
+import { radioValues } from "./radio";
 
 const Card = (props) => {
     const { ref } = props;
@@ -92,14 +93,14 @@ class Content extends Component<Props, any> {
     }
 
     handleSubmit(newProps: Props) {
-        const { searching, clearLocks } = newProps
+        const { searching, clearLocks, sites } = newProps
 
         // reset without rendering
         this.state.res = [] as any
         this.page = 1
         clearLocks()
         this.res = {}
-        newProps.sites.forEach(site => {
+        sites.forEach((site: IRequest) => {
             this.getRequest({ ...searching, ...site, page: this.page })
         })
         this.page++
@@ -109,7 +110,7 @@ class Content extends Component<Props, any> {
         const lastElement = this.node
         const { searchType, lockSite } = this.props
         const { site, country, noSiteAppend, locked } = req;
-        if (locked) return false; 
+        if (locked) return false;
         const url = REQ.stitchUrl({
             ...req
         })
@@ -118,11 +119,11 @@ class Content extends Component<Props, any> {
                 return res.text()
             }).then(res => {
                 this.props.setSearching(false);
-                const _country = searchType !== 'location' ? country : null
+                const _country = searchType !== radioValues.location ? country : null
                 const _site = [ISO.shortHandles[_country], site].filter(Boolean).join(' - ')
                 const array = REQ.stripDOM({ xml: res, site, country, noSiteAppend })
                 if (array.length === 0 || (this.res[_site] || []).find(item => item.title.url === array[0].title.url)) {
-                    if (searchType !== 'location'){
+                    if (searchType !== radioValues.location) {
                         lockSite({ site, _country })
                     } else {
                         lockSite({ site })
@@ -137,7 +138,7 @@ class Content extends Component<Props, any> {
                     lastElement.scrollIntoView({ block: 'nearest' })
                 }
             })
-        return true; // used to signal if there should be a loading animation
+        return true // used to signal if there should be a loading animation
     }
 
     handleScroll = (ev: Event) => {
@@ -146,7 +147,7 @@ class Content extends Component<Props, any> {
             && !this.props.events.toggleFavs
             && !isSearching) {
             sites.forEach(site => {
-                if (this.getRequest({ ...searching, ...site, page: this.page })) {
+                if ( this.getRequest({ ...searching, ...site, page: this.page })) {
                     this.props.setSearching(true);
                 }
             })

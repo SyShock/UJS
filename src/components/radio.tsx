@@ -3,7 +3,7 @@ import connectStore from "../store/connect";
 import { setSearchType, newSearch, Action } from "../store/actions"
 import { defaultStore } from "../store/store";
 
-const types = {
+export const radioValues = {
     all: 'all',
     remote: 'remote',
     location: 'location'
@@ -27,12 +27,12 @@ export class Radio extends Component<Props, any> {
         if (newProps.searchType !== this.props.searchType) {
             const type = newProps.searchType
             switch (type) {
-                case (types.all):
+                case (radioValues.all):
                     this.removeLocation(newProps)
                     break;
-                case (types.location):
+                case (radioValues.location):
                     break;
-                case (types.remote):
+                case (radioValues.remote):
                     this.removeLocation(newProps)
                     break;
             }

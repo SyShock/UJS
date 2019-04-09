@@ -53,7 +53,7 @@ interface MenuProps {
     hide?: () => void,
     onSelect: (...any) => void
     setRefs?: (element: any, index: number) => void
-    style: string
+    style?: string
 }
 
 class DropMenu extends Component<MenuProps, any> {

@@ -66,8 +66,10 @@ const setUserAgent = (window, userAgent) => {
         let location
         if (request.country && Object.values(source)[0] instanceof Object) {
             source = source[request.country]
+            if (!source) return
             location = request.location ? `&${source.location}${request.location}` : ''
         } else {
+            // for stackoverflow or sites without a country GET parameter
             location = request.country ? `&${source.location}${ISO.shortHandles[request.country]}+${request.location}` : ''
         }
         if (!source) return
@@ -78,8 +80,9 @@ const setUserAgent = (window, userAgent) => {
         const expMin = request.expMin ? `&${source.expMin}${request.expMin}` : ''
         const expMax = request.expMax ? `&${source.expMax}${request.expMax}` : ''
         const page = request.page ? `&${source.page.replace('{num}', request.page).replace('{dec}', (request.page-1)*20)}` : ''
+        const country = source.country && request.country ? `&${source.country}`: '' 
         
-        const url = site + search + location + include + exclude  + expMin + expMax + page
+        const url = site + search + location + country + include + exclude  + expMin + expMax + page
         return encodeURI(url)
     }
 
@@ -129,12 +132,12 @@ const setUserAgent = (window, userAgent) => {
                 filtered.push({
                     title: {
                         name: (title.firstElementChild || title).getAttribute('title') || title.textContent.trim(),
-                        url: (noSiteAppend ? '' : base) + (!!applicationURL ? applicationURL : (title.getElementsByTagName('a')[0] || title).getAttribute('href'))
+                        url: (base || '') + (!!applicationURL ? applicationURL : (title.getElementsByTagName('a')[0] || title).getAttribute('href'))
                     },
                     postedOn: postedOn.textContent,
                     company: {
                         name: (company.firstElementChild || company).getAttribute('title') || company.textContent.trim(),
-                        url: companyURL ? (noSiteAppend ? '' : base) + companyURL : null
+                        url: companyURL ? (base || '') + companyURL : null
                     },
                     location: location ? location.textContent : '',
                     site: site,
